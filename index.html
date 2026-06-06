@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>反诈中心 - Demo</title>
+    <!-- 分离后的 CSS 文件 -->
+    <link rel="stylesheet" href="styles.css" />
+    <!-- 必要的动态内联样式保留（仅用于 panel 初始化显示，不影响样式分离） -->
+    <style>
+        /* 仅保留与布局显示相关的极小部分，保证初始面板可见（不涉及主题样式） */
+        .panel.is-show {
+            display: flex;
+            flex-direction: column;
+            min-height: 550px;
+        }
+        .panel.is-show .card {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .scene-chat-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 6px;
+        }
+        .story .story__body {
+            flex: 1;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+    </style>
+</head>
+<body>
+    <header class="topnav">
+        <div class="topnav__inner">
+            <div class="brand">
+                <div class="brand__logo">反</div>
+                <div class="brand__name">反诈中心</div>
+            </div>
+            <nav class="menu">
+                <button class="menu__item is-active" data-tab="home">首页</button>
+                <button class="menu__item" data-tab="scene">场景模拟</button>
+                <button class="menu__item" data-tab="judge">风险研判</button>
+                <button class="menu__item" data-tab="report">一键举报</button>
+                <button class="menu__item" data-tab="kb">反诈小课堂</button>
+                <button class="menu__item" data-tab="game">反诈闯关</button>
+            </nav>
+            <div class="topnav__right">
+                <button class="linkbtn" data-tab="report">恶意线索举报</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 英雄区：已将“辨伪·劝止·守护”移动至右侧人物形象框内下部 -->
+    <section class="hero" id="tab-home">
+        <div class="hero__inner">
+            <div class="hero__left">
+                <h1 class="hero__title">谛听</h1>
+                <!-- 原左侧标语已移除 -->
+            </div>
+            <div class="hero__right">
+                <img src="./images/abc.jpg" alt="反诈宣传图" class="hero-image" />
+                <p class="hero__tagline--moved">辨伪·劝止·守护</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="workbench" style="display: none;">
+        <div class="workbench__inner">
+            <!-- 场景模拟面板 -->
+            <section class="panel is-show" id="tab-scene">
+                <div class="panel__head"><h2>场景模拟</h2><p>输入骗局关键词，匹配对应案例内容。</p></div>
+                <div class="card" style="margin-bottom:16px;"><div class="scene-chat-row"><input id="sceneChatInput" placeholder="例如：刷单、冒充公检法、游戏交易…" /><button class="btn btn--primary" id="sceneChatSendBtn">匹配</button></div></div>
+                <div class="card story"><div class="story__head"><div><div class="story__title" id="storyTitle">在输入框中输入关键词</div><div class="story__meta">匹配成功后将显示详细剧情及应对建议</div></div><div class="row"><button class="btn btn--primary" id="copyStoryBtn">复制剧情给 AI</button></div></div><pre class="story__body" id="storyBody">等待输入匹配关键词…</pre></div>
+            </section>
+
+            <!-- 风险研判 -->
+            <section class="panel" id="tab-judge">
+                <div class="panel__head"><h2>风险研判</h2><p>粘贴可疑链接/文本进行快速检测（规则引擎 Demo）。</p></div>
+                <div class="grid"><div class="card"><div class="form"><label class="label">可疑链接（URL）</label><input id="urlInput" class="input" /><label class="label">可疑内容（文本）</label><textarea id="textInput" class="textarea"></textarea><div class="row"><button class="btn btn--primary" id="runJudgeBtn">开始研判</button><button class="btn btn--ghost btn--small" id="fillHighBtn">高风险示例</button><button class="btn btn--ghost btn--small" id="fillMediumBtn">中风险示例</button><button class="btn btn--ghost btn--small" id="fillLowBtn">低风险示例</button></div></div></div><div class="card"><div class="card__title">研判结果</div><div id="riskBadge" class="risk risk--low">LOW</div><ul id="signals" class="list"></ul><div class="card__title" style="margin-top:12px">劝阻建议</div><div id="advice" class="advice"></div><div class="row"><button class="btn btn--ghost" id="copyAdviceBtn">复制话术</button><button class="btn btn--ghost" id="openAiBtnFromJudge">高风险实例</button></div></div></div>
+            </section>
+
+            <!-- 一键举报 -->
+            <section class="panel" id="tab-report">
+                <div class="panel__head"><h2>一键举报</h2><p>提交可疑链接/内容（Demo：本地保存，同时请按指引前往官方平台举报）。</p></div>
+                <div class="card"><div class="form"><label class="label">举报类型</label><select id="reportType" class="input"><option value="phishing">钓鱼链接</option><option value="impersonation">冒充机构</option><option value="investment">虚假投资</option><option value="task">刷单返利</option><option value="loan">校园贷/网贷</option></select><label class="label">证据（链接/账号/群号/内容）</label><textarea id="reportEvidence" class="textarea"></textarea><div class="row"><button class="btn btn--primary" id="submitReportBtn">提交举报</button><button class="btn btn--ghost" id="viewReportsBtn">查看本地记录</button></div><div id="reportLog" class="log is-hidden"></div><div style="margin-top:16px; padding:12px; background:rgba(255,255,255,.05); border-radius:12px; font-size:13px; line-height:1.7;">🚔 <strong>官方举报渠道</strong><br>• 网络违法犯罪举报网站：<a href="https://cyberpolice.mps.gov.cn/" target="_blank" rel="noopener" style="color:#6ee7ff;">cyberpolice.mps.gov.cn</a><br>• 国家反诈中心 APP（各大应用商店可下载）<br>• 反诈专线：<strong>96110</strong><br>• 紧急情况请直接拨打 <strong>110</strong></div></div></div>
+            </section>
+
+            <!-- 反诈小课堂 -->
+            <section class="panel" id="tab-kb">
+                <div class="panel__head"><h2>反诈小课堂</h2><p>关键词检索（Demo：静态知识条目）。<strong>点击任意问题，可查看详细反诈知识。</strong></p></div>
+                <div class="card"><input id="kbSearch" class="input" placeholder="搜索：刷单 / 公检法 / 安全账户 / 验证码..." /><div id="kbList" class="kb"></div></div>
+            </section>
+
+            <!-- 反诈闯关 -->
+            <section class="panel" id="tab-game">
+                <div class="panel__head"><h2>⚔️ 反诈闯关训练营</h2><p>学习十大反诈类型，用智慧识破骗局，赢取反诈积分！</p></div>
+                <div class="card"><div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 20px;"><div class="score-board">🏆 我的反诈积分: <span id="totalPoints">0</span> 分</div></div><div class="game-mode-selector"><button id="randomModeBtn" class="game-mode-btn">🎲 随机模式</button><button id="freeModeBtn" class="game-mode-btn">📖 自主模式</button></div><div id="gameArea"></div></div>
+            </section>
+        </div>
+    </section>
+
+    <button class="ai-fab" id="aiFab"><span class="ai-fab__icon">AI</span><span>反诈助手</span></button>
+    <aside class="ai-drawer" id="aiDrawer" aria-hidden="true">
+    <div class="ai-drawer__head">
+        <div>
+            <div class="ai-drawer__title">AI 反诈助手</div>
+            <!-- 原来的 .ai-drawer__sub 已删除 -->
+        </div>
+        <!-- 原来的 .ai-drawer__actions 整个已删除 -->
+    </div>
+    <!-- 以下内容全部保留，切勿改动 -->
+    <div class="chat-messages" id="chatMessages"></div>
+    <div id="difyConfigPanel" style="display:none;padding:12px;">
+        <div style="display:flex;flex-direction:column;gap:8px;">
+            <label>Dify Base URL</label>
+            <input id="cfgBaseUrl" class="input" />
+            <label>Dify Pro API Key</label>
+            <input id="cfgProKey" class="input" />
+            <div style="display:flex;gap:8px;">
+                <button id="saveDifyConfigBtn">保存</button>
+                <button id="cancelDifyConfigBtn">取消</button>
+            </div>
+        </div>
+    </div>
+    <div class="chat-attachments-preview is-hidden" id="chatAttachmentsPreview"></div>
+    <div class="chat-input-bar">
+        <input type="file" id="mediaFileInput" style="display:none" multiple />
+        <button class="chat-attach-btn" id="chatAttachBtn">📎</button>
+        <textarea class="chat-textarea" id="chatInput" placeholder="请输入您要判别的内容…" rows="1"></textarea>
+        <button class="chat-send-btn" id="chatSendBtn">↑</button>
+    </div>
+</aside>
+    <div class="backdrop" id="backdrop"></div>
+    <div id="knowledgeModal" class="knowledge-modal"><div class="knowledge-modal__content"><div class="knowledge-modal__header"><h3 id="modalTitle">反诈知识详情</h3><button class="knowledge-modal__close" id="closeModalBtn">&times;</button></div><div id="modalBody" class="knowledge-modal__body"></div></div></div>
+
+    <script>
+        window.DIFY_CONFIG = {
+            baseUrl: localStorage.getItem("DIFY_BASE_URL") || "https://api.dify.ai",
+            apiKey: localStorage.getItem("DIFY_PRO_API_KEY") || localStorage.getItem("DIFY_API_KEY") || "",
+            workflow_yaml: "./反诈劝阻助手(pro版) (1).yml",
+        };
+    </script>
+    <input id="workflowFileInput" type="file" style="display:none" />
+    <script src="./ap.js"></script>
+</body>
+</html>
